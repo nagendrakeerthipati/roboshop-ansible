@@ -2,6 +2,11 @@
   hosts: Backend
   become: true
   tasks:
+    - name: copy mongoDB repo
+      ansible.builtin.copy:
+        src: mongo.repo
+        dest: /etc/yum.repos.d/mongo.repo
+
     - name: install MongoDB package
       ansible.builtin.dnf:
         name: mongodb-org
