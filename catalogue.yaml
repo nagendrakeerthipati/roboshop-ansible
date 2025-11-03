@@ -77,7 +77,7 @@
         state: present
 
     - name: check the data is loaded are not
-      ansible.builtin.command: mongosh --host mongodb.nagendrablog.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")'
+      ansible.builtin.command: mongosh --host mongodb.sh.nagendrablog.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")'
       register: catalogue_output
 
     - name: printing the catalogue_output
