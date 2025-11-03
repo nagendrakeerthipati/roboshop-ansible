@@ -85,5 +85,5 @@
         msg: "{{ catalogue_output }}"
 
     - name: load product
-      ansible.builtin.shell: mongosh --host mongodb.nagendrablog.site </app/db/master-data.js
+      ansible.builtin.shell: mongosh --host mongodb.sh.nagendrablog.site </app/db/master-data.js
       when: catalogue_output.stdout | int < 0
