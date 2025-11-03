@@ -1,12 +1,63 @@
+# - name: install module catalogue
+#   hosts: catalogue
+#   become: yes
+#   tasks:
+#     - name: disable nodejs
+#       ansible.builtin.command: dnf module disable nodejs -y
+
+#     - name: enable nodejs
+#       ansible.builtin.command: dnf module enable nodejs:20 -y
+
+#     - name: create system user
+#       ansible.builtin.user:
+#         name: roboshop
+#         shell: /sbin/nologin
+#         home: /app
+#         system: yes
+
+#     - name: create app directory
+#       ansible.builtin.file:
+#         path: /app
+#         state: directory
+
+#     - name: download roboshop-artifacts
+#       ansible.builtin.get_url:
+#         url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
+#         dest: /tmp/catalogue.zip
+
+#     # this  module thinks  file exist  on ansible  control  server, needs to extract on to remote machine
+#     # remote_src --> means file already exist in catalogue server
+#     - name: unarchive the file
+#       ansible.builtin.unarchive:
+#         src: /tmp/catalogue.zip
+#         dest: /app
+#         remote_src: yes
+
+#     - name: Install npm dependencies
+#       community.general.npm:
+#         path: /app
+
+#     - name: copy catalogue service to system module
+#       ansible.builtin.copy:
+#         src: catalogue.service
+#         dest: /etc/systemd/system/catalogue.service
+#         remote_src: yes
+
 - name: install module catalogue
   hosts: catalogue
   become: yes
+
   tasks:
     - name: disable nodejs
       ansible.builtin.command: dnf module disable nodejs -y
 
-    - name: enable nodejs
+    - name: enable nodejs 20
       ansible.builtin.command: dnf module enable nodejs:20 -y
+
+    - name: install nodejs
+      ansible.builtin.dnf:
+        name: nodejs
+        state: present
 
     - name: create system user
       ansible.builtin.user:
@@ -25,8 +76,6 @@
         url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
         dest: /tmp/catalogue.zip
 
-    # this  module thinks  file exist  on ansible  control  server, needs to extract on to remote machine
-    # remote_src --> means file already exist in catalogue server
     - name: unarchive the file
       ansible.builtin.unarchive:
         src: /tmp/catalogue.zip
@@ -37,7 +86,7 @@
       community.general.npm:
         path: /app
 
-    - name: copy catalogue service to system module
+    - name: copy catalogue service to systemd
       ansible.builtin.copy:
         src: catalogue.service
         dest: /etc/systemd/system/catalogue.service
