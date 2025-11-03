@@ -20,7 +20,7 @@
         backup: yes
 
     - name: disable protection mode
-      ansibile.builtin.lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/redis/redis.conf
         regexp: "protected-mode"
         line: "protected-mode no" # we will check if '' quotes work or not
