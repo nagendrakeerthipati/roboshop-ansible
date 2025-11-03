@@ -47,15 +47,6 @@
         src: catalogue.service
         dest: /etc/systemd/system/catalogue.service
 
-    - name: Install npm dependencies
-      community.general.npm:
-        path: /app
-
-    - name: copy catalogue service to systemd
-      ansible.builtin.copy:
-        src: catalogue.service
-        dest: /etc/systemd/system/catalogue.service
-
     - name: daemon-reload
       ansible.builtin.systemd_service:
         daemon_reload: true
