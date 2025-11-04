@@ -1,46 +1,64 @@
-- name: install module frontend
+- name: Install and configure frontend module
   hosts: frontend
   become: yes
+
   tasks:
-    - name: disable nginx
+    - name: Disable nginx module
       ansible.builtin.command: dnf module disable nginx -y
+      args:
+        warn: false
+      register: disable_nginx
+      changed_when: "'Nothing to do' not in disable_nginx.stdout"
 
-    - name: enable nginx:1.24
+    - name: Enable nginx:1.24 module
       ansible.builtin.command: dnf module enable nginx:1.24 -y
+      args:
+        warn: false
+      register: enable_nginx
+      changed_when: "'Nothing to do' not in enable_nginx.stdout"
 
-    - name: install nginx
+    - name: Install nginx
       ansible.builtin.dnf:
         name: nginx
         state: present
 
-    - name: start and enable nginx
+    - name: Start and enable nginx service
       ansible.builtin.service:
         name: nginx
         state: started
         enabled: yes
 
-    - name: Remove file (delete file)
+    - name: Remove default nginx content
       ansible.builtin.file:
-        path: /usr/share/nginx/html/*
+        path: /usr/share/nginx/html
         state: absent
 
-    - name: download nginx artifacts
+    - name: Recreate nginx html directory
+      ansible.builtin.file:
+        path: /usr/share/nginx/html
+        state: directory
+        mode: "0755"
+
+    - name: Download frontend artifact
       ansible.builtin.get_url:
         url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
         dest: /tmp/frontend.zip
+        mode: "0644"
 
-    - name: Unarchive a file that needs to be downloaded (added in 2.0)
+    - name: Extract frontend content
       ansible.builtin.unarchive:
         src: /tmp/frontend.zip
         dest: /usr/share/nginx/html
         remote_src: yes
 
-    - name: copy nginx.conf to frontend
+    - name: Copy nginx.conf to frontend
       ansible.builtin.copy:
         src: nginx.conf
         dest: /etc/nginx/nginx.conf
+        mode: "0644"
+        backup: yes
 
-    - name: restart nginx
+    - name: Restart nginx
       ansible.builtin.service:
         name: nginx
         state: restarted
