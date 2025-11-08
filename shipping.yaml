@@ -3,7 +3,7 @@
   become: yes
 
   tasks:
-    - name: install maveen and mqsl
+    - name: install maven and mysql client
       ansible.builtin.dnf:
         name: "{{ item }}"
         state: present
@@ -28,21 +28,24 @@
         url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
         dest: /tmp/shipping.zip
 
-    - name: unarchive the shipping file
+    - name: unarchive the shipping file (idempotent)
       ansible.builtin.unarchive:
         src: /tmp/shipping.zip
         dest: /app
         remote_src: yes
+        creates: /app/pom.xml
 
-    - name: clean package
+    - name: clean package only if JAR not built
       ansible.builtin.command: mvn clean package
       args:
         chdir: /app
+        creates: /app/target/shipping-1.0.jar
 
-    - name: move shipping jar file
+    - name: move shipping jar file only if not renamed
       ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
       args:
         chdir: /app
+        creates: /app/shipping.jar
 
     - name: copy shipping service to system module
       ansible.builtin.copy:
@@ -60,8 +63,7 @@
         enabled: true
 
     - name: import data
-      tags:
-        - import
+      tags: [import]
       community.mysql.mysql_db:
         name: all
         login_user: root
@@ -75,8 +77,7 @@
         - /app/db/master-data.sql
 
     - name: restart shipping
-      tags:
-        - import
+      tags: [import]
       ansible.builtin.service:
         state: restarted
         name: shipping

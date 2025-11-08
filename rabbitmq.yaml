@@ -1,0 +1,10 @@
+- name: create rabbitmq and copy the repo
+  hosts: rabbitmq
+  become: yes
+  tasks:
+    - name: copy the rabbitmq repo
+      ansible.builtin.copy:
+        src: rabbitmq.repo
+        dest: /etc/yum.repos.d/rabbitmq.repo
+
+    - name:
