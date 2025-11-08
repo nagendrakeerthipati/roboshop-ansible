@@ -10,6 +10,7 @@
       loop:
         - maven
         - mysql
+        - PyMySQL
 
     - name: create system user
       ansible.builtin.user:
