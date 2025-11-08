@@ -1,6 +1,7 @@
 - name: create shipping module
   hosts: shipping
   become: yes
+
   tasks:
     - name: install maveen
       ansible.builtin.dnf:
@@ -33,7 +34,7 @@
     - name: clean package
       ansible.builtin.command: mvn clean package
       args:
-      chdir: /app
+        chdir: /app
 
     - name: move shipping jar file
       ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
@@ -53,4 +54,4 @@
       ansible.builtin.service:
         name: shipping
         state: started
-        enabled: yes
+        enabled: true
