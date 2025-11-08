@@ -32,12 +32,12 @@
 
     - name: clean package
       ansible.builtin.command: mvn clean package
-      agrs:
-        chdir: /app
+      args:
+      chdir: /app
 
     - name: move shipping jar file
       ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
-      agrs:
+      args:
         chdir: /app
 
     - name: copy shipping service to system module
@@ -49,8 +49,8 @@
       ansible.builtin.systemd_service:
         daemon_reload: true
 
-    - name: enable catalogue and start
+    - name: enable shipping and start
       ansible.builtin.service:
-        name: catalogue
+        name: shipping
         state: started
         enabled: yes
