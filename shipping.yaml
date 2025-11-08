@@ -10,7 +10,6 @@
       loop:
         - maven
         - mysql
-        - PyMySQL
 
     - name: create system user
       ansible.builtin.user:
@@ -62,6 +61,10 @@
         name: shipping
         state: started
         enabled: true
+
+    - name: install python mysql dependency for ansible
+      ansible.builtin.pip:
+        name: PyMySQL
 
     - name: import data
       tags: [import]
