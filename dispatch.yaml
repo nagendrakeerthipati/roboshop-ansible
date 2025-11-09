@@ -1,11 +1,12 @@
 - name: configure the dispatch
   hosts: dispatch
   become: yes
+
   tasks:
     - name: install golang
       ansible.builtin.dnf:
         name: golang
-        state: installed
+        state: present
 
     - name: create system user
       ansible.builtin.user:
@@ -24,29 +25,35 @@
         url: https://roboshop-artifacts.s3.amazonaws.com/dispatch-v3.zip
         dest: /tmp/dispatch.zip
 
-    # this  module thinks  file exist  on ansible  control  server, needs to extract on to remote machine
-    # remote_src --> means file already exist in catalogue server
-    - name: unarchive the file
+    - name: unarchive dispatch code
       ansible.builtin.unarchive:
         src: /tmp/dispatch.zip
         dest: /app
         remote_src: yes
 
-    - name: run go build steps
-      ansible.builtin.command: "{{ item }}"
+    # very important – idempotent go mod init
+    - name: go mod init only if not exists
+      ansible.builtin.command: go mod init dispatch
       args:
         chdir: /app
-      loop:
-        - "go mod init dispatch"
-        - "go mod tidy"
-        - "go build"
+        creates: /app/go.mod
 
-    - name: copy catalogue service to system module
+    - name: go mod tidy
+      ansible.builtin.command: go mod tidy
+      args:
+        chdir: /app
+
+    - name: go build
+      ansible.builtin.command: go build
+      args:
+        chdir: /app
+
+    - name: copy dispatch service to systemd
       ansible.builtin.copy:
         src: dispatch.service
         dest: /etc/systemd/system/dispatch.service
 
-    - name: daemon-reload
+    - name: daemon-reload systemd
       ansible.builtin.systemd_service:
         daemon_reload: true
 
