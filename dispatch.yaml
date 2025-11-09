@@ -22,7 +22,7 @@
     - name: download roboshop-artifacts
       ansible.builtin.get_url:
         url: https://roboshop-artifacts.s3.amazonaws.com/dispatch-v3.zip
-        dest: /tmp/catalogue.zip
+        dest: /tmp/dispatch.zip
 
     # this  module thinks  file exist  on ansible  control  server, needs to extract on to remote machine
     # remote_src --> means file already exist in catalogue server
